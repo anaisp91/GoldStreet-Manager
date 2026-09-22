@@ -1,0 +1,55 @@
+import jwt from "jsonwebtoken";
+import type { Request, Response } from "express";
+import { User } from "../models/userModel.js";
+import bcrypt from "bcrypt";
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Datos incompletos" });
+    }
+
+    const registeredUser = await User.findOne({ email }).select("+password");
+    if (!registeredUser) {
+      return res.status(401).json({ message: "Credenciales invalidas" });
+    }
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      registeredUser.password,
+    );
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Credenciales invalidas" });
+    }
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return res
+        .status(500)
+        .json({ message: "Error de configuración del servidor" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: registeredUser._id,
+        role: registeredUser.role,
+      },
+      jwtSecret,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    return res.json({
+      token,
+      user: {
+        id: registeredUser._id,
+        name: registeredUser.name,
+        email: registeredUser.email,
+        role: registeredUser.role,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error al iniciar sesión" });
+  }
+};
