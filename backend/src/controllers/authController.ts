@@ -3,6 +3,38 @@ import type { Request, Response } from "express";
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Datos incompletos" });
+    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Usruario ya regsitrado" });
+    }
+    const saltRounds = Number.parseInt(
+      String(process.env.BCRYPT_SALT_ROUNDS ?? 10),
+    );
+    const hashed = await bcrypt.hash(password, saltRounds);
+    const user: User = {
+      name,
+      email,
+      password: hashed,
+      role: "manager",
+    };
+    const newUser = await User.create(user);
+    return res.status(201).json({
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error en la petición" });
+  }
+};
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
