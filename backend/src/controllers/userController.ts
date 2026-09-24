@@ -6,12 +6,19 @@ interface CreateUser {
   name: string;
   email: string;
   password: string;
-  role: "artist" | "manager";
+  role: "artist";
+  managerId: string;
 }
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const allUsers = await User.find();
+    const { role, id } = req.user;
+    if (role !== "manager" || !id) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+    const allUsers = await User.find({
+      managerId: id,
+    });
     return res.json(allUsers);
   } catch (error) {
     res.status(500).json({ message: "Error al traer los usuarios" });
@@ -20,9 +27,13 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
-    if (!name || !email || !password || !role) {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
       return res.status(400).json({ message: "Datos incompletos" });
+    }
+    const { role, id } = req.user;
+    if (role !== "manager" || !id) {
+      return res.status(403).json({ message: "No autorizado" });
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -39,7 +50,8 @@ export const createUser = async (req: Request, res: Response) => {
       name,
       email,
       password: hashed,
-      role,
+      role: "artist",
+      managerId: id,
     };
     const newUser = await User.create(user);
     return res.status(201).json({
@@ -47,6 +59,7 @@ export const createUser = async (req: Request, res: Response) => {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      managerId: newUser.managerId,
     });
   } catch (error) {
     return res.status(500).json({ message: "Error al crear al usuario" });
@@ -55,8 +68,14 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id);
+    const { id: userId } = req.params;
+    const { role, id: managerId } = req.user;
+
+    if (role !== "manager" || !managerId) {
+      return res.status(403).json({ message: "Credenciales incorrectas" });
+    }
+
+    const user = await User.findOne({ _id: userId, managerId: managerId });
     if (!user) {
       return res.status(404).json({ message: "El usuario no existe" });
     }
