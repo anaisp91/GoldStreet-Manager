@@ -87,25 +87,43 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id: userId } = req.params;
+    const { role, id: managerId } = req.user;
+    if (role !== "manager" || !managerId) {
+      return res.status(403).json({ message: "Credenciales invalidas" });
+    }
 
     if (Object.keys(req.body).length === 0) {
-      return res.status(400).json({ message: "No hay cambis que actualizar" });
+      return res.status(400).json({ message: "No hay cambios que actualizar" });
     }
-    const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+    const user = await User.findByIdAndUpdate(
+      { _id: userId, managerId: managerId },
+      req.body,
+      {
+        new: true,
+      },
+    );
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     return res.json(user);
   } catch (error) {
+    console.log("ERROR", error);
     return res.status(500).json({ message: "Error en la petición" });
   }
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const user = await User.findByIdAndDelete(id);
+    const { id: userId } = req.params;
+    const { role, id: managerId } = req.user;
+    if (role !== "manager" || !managerId) {
+      return res.status(403).json({ message: "Credenciales invalidas" });
+    }
+    const user = await User.findOneAndDelete({
+      _id: userId,
+      managerId: managerId,
+    });
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
