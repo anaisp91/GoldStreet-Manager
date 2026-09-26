@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/userModel.js";
+import { stringify } from "node:querystring";
 
 interface CreateUser {
   name: string;
@@ -89,23 +90,44 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id: userId } = req.params;
     const { role, id: managerId } = req.user;
+    const { name, email, password } = req.body;
+
     if (role !== "manager" || !managerId) {
       return res.status(403).json({ message: "Credenciales invalidas" });
     }
 
-    if (Object.keys(req.body).length === 0) {
-      return res.status(400).json({ message: "No hay cambios que actualizar" });
+    const updateObj: {
+      name?: string;
+      email?: string;
+      password?: string;
+    } = {};
+
+    if (name) updateObj.name = name;
+    if (email) updateObj.email = email;
+    if (password) {
+      const saltRounds = Number.parseInt(
+        String(process.env.BCRYPT_SALT_ROUNDS ?? 10),
+        10,
+      );
+      updateObj.password = await bcrypt.hash(password, saltRounds);
     }
-    const user = await User.findByIdAndUpdate(
+
+    if (Object.keys(updateObj).length === 0) {
+      return res.status(400).json({ message: "No hay cambiso que actualizar" });
+    }
+
+    const user = await User.findOneAndUpdate(
       { _id: userId, managerId: managerId },
-      req.body,
+      updateObj,
       {
         new: true,
       },
     );
+
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
+
     return res.json(user);
   } catch (error) {
     console.log("ERROR", error);

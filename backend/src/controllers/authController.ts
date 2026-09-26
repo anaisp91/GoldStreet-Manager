@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -88,7 +89,6 @@ export const login = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const { role, id } = req.user;
     if (role !== "manager" || !id) {
       return res.status(403).json({ message: "Credenciales invalidas" });
@@ -141,5 +141,32 @@ export const updateMe = async (req: Request, res: Response) => {
     return res.status(200).json(managerUser);
   } catch (error) {
     return res.status(500).json({ message: "Error en la petición" });
+  }
+};
+
+export const deleteMe = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  try {
+    const { role, id } = req.user;
+    if (role !== "manager" || !id) {
+      return res.status(403).json({ message: "Credenciales invalidas" });
+    }
+    session.startTransaction();
+    await User.deleteMany({ managerId: id }, { session });
+    const userManager = await User.findOneAndDelete(
+      { _id: id, role: "manager" },
+      { session },
+    );
+    if (!userManager) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: "Manager no encontrado" });
+    }
+    await session.commitTransaction();
+    return res.status(200).json({ message: "Usuario borrado corectamente" });
+  } catch (error) {
+    await session.abortTransaction();
+    return res.status(500).json({ message: "Error en la peticion" });
+  } finally {
+    await session.endSession();
   }
 };
