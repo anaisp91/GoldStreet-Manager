@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/userModel.js";
-import { stringify } from "node:querystring";
 
 interface CreateUser {
   name: string;
