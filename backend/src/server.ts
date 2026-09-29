@@ -1,5 +1,6 @@
 import express from "express";
 import "./config/db.js";
+import "./config/cloudinary.js";
 import { userRouter } from "./routes/userRoutes.js";
 import { authRouter } from "./routes/authRoutes.js";
 import { mediaSetRouter } from "./routes/mediaSetRoutes.js";
