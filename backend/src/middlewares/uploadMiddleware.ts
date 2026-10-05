@@ -17,4 +17,4 @@ const upload = multer({
   },
 });
 
-const uploadFiles = upload.array("files", 3);
+export const uploadFiles = upload.array("files", 3);

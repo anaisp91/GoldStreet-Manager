@@ -2,31 +2,63 @@ import { MediaSet } from "../models/mediaSetModel.js";
 import type { Request, Response } from "express";
 import { User } from "../models/userModel.js";
 import type { MediaFile } from "../models/mediaSetModel.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const createMediaSet = async (req: Request, res: Response) => {
   try {
     const { role, id: userId } = req.user;
-    const { name, description, files } = req.body;
+    const { name, description } = req.body;
+    const files = req.files as Express.Multer.File[];
 
     if (role !== "artist" || !userId) {
       return res.status(403).json({ message: "Credenciales inválidas" });
     }
-    if (!name || !files) {
+
+    if (!name || !files || files.length === 0) {
       return res.status(400).json({ message: "Datos incompletos" });
     }
+    //Funcion auxiliar que recibe buffer y promete devolver Mediafile
+    const uploadToCloudinary = (buffer: Buffer): Promise<MediaFile> => {
+      //Creamos la Promesa
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {},
+          (error, result) => {
+            if (error || !result) {
+              reject(error);
+              return;
+            }
+
+            resolve({
+              //Cloudinary nos devuelve secure_url,
+              // la transformamos a url en formato de nuestra interfaz.
+              url: result.secure_url,
+              publicId: result.public_id,
+            });
+          },
+        );
+        //Mandamos el buffer
+        stream.end(buffer);
+      });
+    };
+    //Por cada archivo, recoge el buffer y lo dube a Cloudinary
+    //Cada archivo crea una Promise, Promise.all, espera a que terminen todas
+    const filesUploaded = await Promise.all(
+      files.map((file) => uploadToCloudinary(file.buffer)),
+    );
+
     const mediaSet = {
       name,
       description,
-      files,
+      files: filesUploaded,
       artistId: userId,
     };
+
     const newMediaSet = await MediaSet.create(mediaSet);
-    return res.status(201).json({
-      name: newMediaSet.name,
-      description: newMediaSet.description,
-      files: newMediaSet.files,
-    });
+
+    return res.status(201).json(newMediaSet);
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Error en la petición" });
   }
 };

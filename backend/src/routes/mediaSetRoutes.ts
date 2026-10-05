@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { uploadFiles } from "../middlewares/uploadMiddleware.js";
 import {
   createMediaSet,
   getAllMediaSet,
@@ -10,7 +11,7 @@ import {
 
 export const mediaSetRouter = Router();
 
-mediaSetRouter.post("/media-set", authMiddleware, createMediaSet);
+mediaSetRouter.post("/media-set", authMiddleware, uploadFiles, createMediaSet);
 mediaSetRouter.get("/media-set", authMiddleware, getAllMediaSet);
 mediaSetRouter.get("/media-set/:id", authMiddleware, getMediaSetById);
 mediaSetRouter.put("/media-set/:id", updateMediaSet);
