@@ -4,6 +4,7 @@ import { User } from "../models/userModel.js";
 import type { MediaFile } from "../models/mediaSetModel.js";
 import { v2 as cloudinary } from "cloudinary";
 
+//Create conectado a Cloudinary
 export const createMediaSet = async (req: Request, res: Response) => {
   try {
     const { role, id: userId } = req.user;
@@ -122,7 +123,7 @@ export const updateMediaSet = async (req: Request, res: Response) => {
   try {
     const { role, id: userId } = req.user;
     const { id } = req.params;
-    const { name, description, files, used } = req.body;
+    const { name, description, used } = req.body;
 
     if (!role || !userId) {
       return res.status(403).json({ message: "Credenciales inválidas" });
@@ -131,11 +132,9 @@ export const updateMediaSet = async (req: Request, res: Response) => {
       const updateObj: {
         name?: string;
         description?: string;
-        files?: MediaFile[];
       } = {};
       if (name) updateObj.name = name;
       if (description !== undefined) updateObj.description = description;
-      if (files) updateObj.files = files;
 
       const mediaSet = await MediaSet.findOneAndUpdate(
         {
@@ -172,4 +171,32 @@ export const updateMediaSet = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteMediaSet = () => {};
+export const deleteMediaSet = async (req: Request, res: Response) => {
+  try {
+    const { role, id: userId } = req.user;
+    const { id } = req.params;
+
+    if (!role || !userId) {
+      return res.status(403).json({ message: "Credenciales inválidas" });
+    }
+    if (role === "manager") {
+      return res.status(403).json({ message: "Credenciales inválidas" });
+    }
+
+    const mediaSet = await MediaSet.findOne({
+      _id: id,
+      artistId: userId,
+    });
+    if (!mediaSet) {
+      return res.status(404).json({ message: "MediaSet no encontrado" });
+    }
+    await Promise.all(
+      mediaSet.files.map((file) => cloudinary.uploader.destroy(file.publicId)),
+    );
+    await MediaSet.findByIdAndDelete(id);
+    return res.status(200).json({ message: "MediaSet borrado correctamente" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error en la petición" });
+  }
+};
