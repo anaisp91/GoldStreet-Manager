@@ -39,7 +39,7 @@ export const Home = () => {
         <div className=" flex flex-row gap-6 self-center pt-6">
           <Link
             to="/register"
-            className="px-7 py-2 text-white text-[1.2rem] uppercase rounded-2xl bg-blue-600  hover:bg-transparent active:bg-transparent hover:border active:border hover:border-blue-600 active:border-blue-600 active:scale-95 transition-colors duration-300 "
+            className="px-7 py-2 text-white text-[1.2rem] uppercase rounded-2xl bg-blue-600 border border-transparent hover:bg-transparent active:bg-transparent   hover:border-blue-600 active:border-blue-600 active:scale-95 transition-colors duration-300 "
           >
             Registro
           </Link>
