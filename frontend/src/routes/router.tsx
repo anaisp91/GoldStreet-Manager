@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, Login, Register } from "../pages";
+import { Home, Login, Mdashboard, Register } from "../pages";
 import { PublicLayout } from "../layouts/PublicLayout";
+import { PrivateLayout } from "../layouts/PrivateLayout";
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +18,15 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+    ],
+  },
+  {
+    element: <PrivateLayout />,
+    children: [
+      {
+        path: "/mdash",
+        element: <Mdashboard />,
       },
     ],
   },
