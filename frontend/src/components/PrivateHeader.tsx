@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const PrivateHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,7 +13,8 @@ export const PrivateHeader = () => {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Abrir menu"
+          aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={isMenuOpen}
         >
           <svg
             className="w-6 h-6 text-gray-400 hover:text-blue-600 action:text-blue-600"
@@ -35,8 +37,14 @@ export const PrivateHeader = () => {
           <div className="absolute top-full  bg-black inset-x-0 py-6 ">
             <nav className="pl-10">
               <ul>
-                <li className="text-lg pb-3">Inicio</li>
-                <li className="text-lg">Cerrar sesión</li>
+                <li className="text-lg pb-3">
+                  <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                    Inicio
+                  </Link>
+                </li>
+                <li className="text-lg">
+                  <button>Cerrar sesión</button>
+                </li>
               </ul>
             </nav>
           </div>
