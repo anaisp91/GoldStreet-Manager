@@ -1,5 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, Login, Mdashboard, Register } from "../pages";
+import {
+  ArtistDashboard,
+  ArtistRegister,
+  Home,
+  Login,
+  Mdashboard,
+  Register,
+} from "../pages";
 import { PublicLayout } from "../layouts/PublicLayout";
 import { PrivateLayout } from "../layouts/PrivateLayout";
 
@@ -27,6 +34,14 @@ export const router = createBrowserRouter([
       {
         path: "/mdash",
         element: <Mdashboard />,
+      },
+      {
+        path: "/add",
+        element: <ArtistRegister />,
+      },
+      {
+        path: "/adash",
+        element: <ArtistDashboard />,
       },
     ],
   },

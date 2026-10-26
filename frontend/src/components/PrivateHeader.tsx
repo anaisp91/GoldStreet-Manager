@@ -27,14 +27,14 @@ export const PrivateHeader = () => {
           >
             <path
               stroke="currentColor"
-              stroke-linecap="round"
+              strokeLinecap="round"
               strokeWidth="2"
               d="M5 7h14M5 12h14M5 17h14"
             />
           </svg>
         </button>
         {isMenuOpen && (
-          <div className="absolute top-full  bg-black inset-x-0 py-6 ">
+          <div className="absolute top-full  bg-blue-800 text-white inset-x-0 py-10 uppercase ">
             <nav className="pl-10">
               <ul>
                 <li className="text-lg pb-3">
@@ -43,7 +43,7 @@ export const PrivateHeader = () => {
                   </Link>
                 </li>
                 <li className="text-lg">
-                  <button>Cerrar sesión</button>
+                  <button className="uppercase">Cerrar sesión</button>
                 </li>
               </ul>
             </nav>
