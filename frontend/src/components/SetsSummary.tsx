@@ -1,10 +1,11 @@
 export type SetsSummaryProps = {
   total: number;
+  title: string;
 };
 
-export const SetsSummary = ({ total }: SetsSummaryProps) => {
+export const SetsSummary = ({ total, title }: SetsSummaryProps) => {
   return (
-    <div className=" bg-gray-900 border rounded-lg py-4 flex flex-row gap-6 px-8 items-center my-3">
+    <div className=" bg-gray-900 border border-gray-700 rounded-lg py-4 flex flex-row gap-6 px-8 items-center my-3">
       <svg
         className="w-8 h-8 text-blue-600"
         aria-hidden="true"
@@ -22,7 +23,7 @@ export const SetsSummary = ({ total }: SetsSummaryProps) => {
       </svg>
 
       <div className="flex flex-col">
-        <p className="text-gray-500 uppercase text-lg">Tus conjuntos</p>
+        <p className="text-gray-500 uppercase text-lg">{title}</p>
         <p className="text-white text-xl font-bold">{total} conjuntos</p>
       </div>
     </div>

@@ -4,3 +4,5 @@ export * from "./Register";
 export * from "./Mdashboard";
 export * from "./ArtistRegister";
 export * from "./ArtistDashboard";
+export * from "./ManagerArtistView";
+export * from "./ManagerSetView";

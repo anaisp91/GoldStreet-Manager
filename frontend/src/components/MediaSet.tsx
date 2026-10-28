@@ -6,7 +6,7 @@ export type MediaSetProps = {
 
 export const MediaSet = ({ name, createdAt, photoTotal }: MediaSetProps) => {
   return (
-    <li className="bg-gray-900 py-4 my-4 border rounded-lg">
+    <li className="bg-gray-900 py-4 my-4 border border-gray-700 rounded-lg">
       <div className="flex flex-row justify-between items-center px-7">
         <div className="flex flex-row items-center gap-6">
           <svg

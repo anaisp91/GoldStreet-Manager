@@ -17,7 +17,7 @@ export const ArtistDashboard = () => {
         Organiza tu conjuntos y ten tus fotografías listas para compartir.
       </p>
 
-      <SetsSummary total={10} />
+      <SetsSummary total={mediaSets.length} title="Tus conjuntos" />
 
       <Link
         to={""}

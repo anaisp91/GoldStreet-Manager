@@ -4,6 +4,8 @@ import {
   ArtistRegister,
   Home,
   Login,
+  ManagerArtistView,
+  ManagerSetView,
   Mdashboard,
   Register,
 } from "../pages";
@@ -42,6 +44,14 @@ export const router = createBrowserRouter([
       {
         path: "/adash",
         element: <ArtistDashboard />,
+      },
+      {
+        path: "/artistView",
+        element: <ManagerArtistView />,
+      },
+      {
+        path: "/mset",
+        element: <ManagerSetView />,
       },
     ],
   },
