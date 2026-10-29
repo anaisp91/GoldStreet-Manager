@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import {
   ArtistDashboard,
   ArtistRegister,
+  ArtistSetView,
   Home,
   Login,
   ManagerArtistView,
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: "/mset",
         element: <ManagerSetView />,
+      },
+      {
+        path: "/aset",
+        element: <ArtistSetView />,
       },
     ],
   },

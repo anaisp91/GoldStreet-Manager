@@ -6,3 +6,4 @@ export * from "./ArtistRegister";
 export * from "./ArtistDashboard";
 export * from "./ManagerArtistView";
 export * from "./ManagerSetView";
+export * from "./ArtistSetView";
