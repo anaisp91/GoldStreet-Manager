@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import "./config/db.js";
+import { connectDB } from "./config/db.js";
 import "./config/cloudinary.js";
 import { userRouter } from "./routes/userRoutes.js";
 import { authRouter } from "./routes/authRoutes.js";
@@ -16,10 +16,19 @@ app.use(authRouter);
 app.use(mediaSetRouter);
 
 app.get("/", (req, res) => {
-  res.send("Gold Street Manager sfuncionando");
+  res.send("Gold Street Manager funcionando");
 });
 
-const PORT = process.env.PORT ?? 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor funcionando en ${PORT}`);
-});
+const stratServer = async () => {
+  try {
+    await connectDB();
+    const PORT = process.env.PORT ?? 3000;
+    app.listen(PORT, () => {
+      console.log(`Servidor funcionando en ${PORT}`);
+    });
+  } catch (error) {
+    console.log("No se pudo iniciar el servidor", error);
+  }
+};
+
+stratServer();
