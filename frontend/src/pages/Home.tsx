@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { testApi } from "../services/testApi";
 
 export const Home = () => {
+  useEffect(() => {
+    testApi();
+  }, []);
   return (
     <>
       <header className="bg-black py-4 text-gray-400 flex flex-row justify-between px-10 items-center">

@@ -1,5 +1,40 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser, type LoginData } from "../services/authService";
+import axios from "axios";
 export const Login = () => {
+  const [formData, setFormData] = useState<LoginData>({
+    email: "",
+    password: "",
+  });
+  const [ok, setOk] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const response = await loginUser(formData);
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
+      setOk(true);
+      setTimeout(() => {
+        navigate("/mdash");
+      }, 2000);
+    } catch (error) {
+      if (axios.isAxiosError<{ message: string }>(error)) {
+        setError(error.response?.data?.message ?? "Error al hacer login");
+      } else {
+        setError("Ha ocurrido un error durante el login");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
       <header className="bg-black py-4 text-blue-600 flex flex-row px-10  items-center">
@@ -15,12 +50,19 @@ export const Login = () => {
           <span className="text-blue-600 ">Inicia sesión </span>y empieza a
           compartir.
         </p>
-        <form className="w-full max-w-sm px-6 flex flex-col gap-5 my-8">
+        <form
+          className="w-full max-w-sm px-6 flex flex-col gap-5 my-8"
+          onSubmit={handleSubmit}
+        >
           <div className="flex flex-col gap-2">
             <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
               className="w-full border border-gray-600 bg-black rounded-md px-4 py-3 text-white "
             />
@@ -30,16 +72,23 @@ export const Login = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               required
               className="w-full border border-gray-600 bg-black rounded-md px-4 py-3 text-white "
             />
           </div>
           <button
             type="submit"
+            disabled={loading || ok}
             className="bg-blue-600 py-3 text-white uppercase rounded-md mt-4 border border-transparent hover:bg-transparent active:bg-transparent  hover:border-blue-600 active:border-blue-600 active:scale-95 transition-colors duration-300"
           >
-            Inicia sesión
+            {loading ? "Iniciando sesión" : "Inicia sesión"}
           </button>
+          {error && <p>{error}</p>}
+          {ok && <p>Redirigiendo...</p>}
         </form>
         <div className="mt-4 text-center">
           <p className="text-base">¿No tienes cuenta?</p>
