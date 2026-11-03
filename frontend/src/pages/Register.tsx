@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
-import { registerUser, type RegisterData } from "../services/authService";
+import type { RegisterData } from "../types/auth";
+import { registerUser } from "../services/authService";
 
 export const Register = () => {
   const [formData, setFormData] = useState<RegisterData>({

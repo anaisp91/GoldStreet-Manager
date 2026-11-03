@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser, type LoginData } from "../services/authService";
+import type { LoginData } from "../types/auth";
+import { loginUser, getMe } from "../services/authService";
 import axios from "axios";
 export const Login = () => {
   const [formData, setFormData] = useState<LoginData>({
@@ -20,7 +21,8 @@ export const Login = () => {
       const response = await loginUser(formData);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
-
+      const myData = await getMe();
+      console.log(myData);
       setOk(true);
       setTimeout(() => {
         navigate("/mdash");

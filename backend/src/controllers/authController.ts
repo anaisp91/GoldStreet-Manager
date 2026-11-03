@@ -97,7 +97,14 @@ export const getMe = async (req: Request, res: Response) => {
     if (!managerUser) {
       return res.status(404).json({ message: "Manager no encontrado" });
     }
-    return res.status(200).json({ managerUser });
+    return res.status(200).json({
+      managerUser: {
+        id: managerUser._id,
+        name: managerUser.name,
+        email: managerUser.email,
+        role: managerUser.role,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ message: "Error en la peticion" });
   }
