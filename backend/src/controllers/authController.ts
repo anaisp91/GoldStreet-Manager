@@ -7,20 +7,39 @@ import mongoose from "mongoose";
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
+      return res.status(400).json({ message: "Datos incorrectos" });
+    }
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedName || !normalizedEmail || !password) {
       return res.status(400).json({ message: "Datos incompletos" });
     }
-    const existingUser = await User.findOne({ email });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ message: "Formato de emial inválido" });
+    }
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "La contraseña debe tener mínimo 6 caracteres" });
+    }
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      return res.status(409).json({ message: "Usruario ya regsitrado" });
+      return res.status(409).json({ message: "Usuario ya registrado" });
     }
     const saltRounds = Number.parseInt(
       String(process.env.BCRYPT_SALT_ROUNDS ?? 10),
     );
     const hashed = await bcrypt.hash(password, saltRounds);
     const user: User = {
-      name,
-      email,
+      name: normalizedName,
+      email: normalizedEmail,
       password: hashed,
       role: "manager",
     };
@@ -39,11 +58,17 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (typeof email !== "string" || typeof password !== "string") {
+      return res.status(400).json({ message: "Datos inválidos" });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ message: "Datos incompletos" });
     }
 
-    const registeredUser = await User.findOne({ email }).select("+password");
+    const registeredUser = await User.findOne({
+      email: normalizedEmail,
+    }).select("+password");
     if (!registeredUser) {
       return res.status(401).json({ message: "Credenciales invalidas" });
     }
@@ -90,19 +115,20 @@ export const login = async (req: Request, res: Response) => {
 export const getMe = async (req: Request, res: Response) => {
   try {
     const { role, id } = req.user;
-    if (role !== "manager" || !id) {
+    if (!role || !id) {
       return res.status(403).json({ message: "Credenciales invalidas" });
     }
-    const managerUser = await User.findOne({ _id: id, role: "manager" });
-    if (!managerUser) {
-      return res.status(404).json({ message: "Manager no encontrado" });
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Usiario no encontrado" });
     }
     return res.status(200).json({
-      managerUser: {
-        id: managerUser._id,
-        name: managerUser.name,
-        email: managerUser.email,
-        role: managerUser.role,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        managerId: user.role === "artist" ? user.managerId : undefined,
       },
     });
   } catch (error) {
