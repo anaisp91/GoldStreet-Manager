@@ -190,9 +190,17 @@ export const deleteMediaSet = async (req: Request, res: Response) => {
     if (!mediaSet) {
       return res.status(404).json({ message: "MediaSet no encontrado" });
     }
-    await Promise.all(
+    const deleteResults = await Promise.all(
       mediaSet.files.map((file) => cloudinary.uploader.destroy(file.publicId)),
     );
+    const acceptedResults = deleteResults.every(
+      (result) => result.result === "ok" || result.result === "not found",
+    );
+    if (!acceptedResults) {
+      return res
+        .status(500)
+        .json({ message: "Error al eliminar las fotografías" });
+    }
     await MediaSet.findByIdAndDelete(id);
     return res.status(200).json({ message: "MediaSet borrado correctamente" });
   } catch (error) {

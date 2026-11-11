@@ -138,68 +138,124 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   try {
-    const { role, id } = req.user;
+    const { id } = req.user;
     const { name, email, password } = req.body;
-    if (role !== "manager" || !id) {
-      return res.status(403).json({ messahe: "Credenciales invalidas" });
-    }
+
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({ message: "No hay cambios que actualizar" });
     }
+
+    if (
+      (name !== undefined && typeof name !== "string") ||
+      (email !== undefined && typeof email !== "string") ||
+      (password !== undefined && typeof password !== "string")
+    ) {
+      return res.status(400).json({ message: "Datos inválidos" });
+    }
+
+    const normalizedName = name !== undefined ? name.trim() : undefined;
+    if (normalizedName !== undefined && !normalizedName) {
+      return res
+        .status(400)
+        .json({ message: "El nomrbre no puede estar vacío" });
+    }
+    const normalizedEmail =
+      email !== undefined ? email.trim().toLowerCase() : undefined;
+    if (normalizedEmail !== undefined && !normalizedEmail) {
+      return res.status(400).json({ message: "El email no puede estar vacío" });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (normalizedEmail !== undefined && !emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ message: "Formato de email inválido" });
+    }
+    if (password !== undefined && password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "La contraseña debe tener mínimo 6 caracteres" });
+    }
+
+    if (!id) {
+      return res.status(403).json({ message: "Credenciales invalidas" });
+    }
+
+    if (normalizedEmail !== undefined) {
+      const existingUser = await User.findOne({
+        email: normalizedEmail,
+        _id: { $ne: id },
+      });
+      if (existingUser) {
+        return res.status(409).json({ message: "Email no disponible" });
+      }
+    }
+
     const updates: {
       name?: string;
       email?: string;
       password?: string;
     } = {};
-    if (name) {
-      updates.name = name;
+    if (normalizedName) {
+      updates.name = normalizedName;
     }
-    if (email) {
-      updates.email = email;
+    if (normalizedEmail) {
+      updates.email = normalizedEmail;
     }
     if (password) {
       const saltRound = Number.parseInt(
         String(process.env.BCRYPT_SALT_ROUNDS ?? 10),
+        10,
       );
       updates.password = await bcrypt.hash(password, saltRound);
     }
-    const managerUser = await User.findOneAndUpdate(
-      { _id: id, role: "manager" },
-      updates,
-      { new: true },
-    );
-    if (!managerUser) {
-      return res.status(404).json({ maessage: "Manager no encontrado" });
+    const user = await User.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    return res.status(200).json(managerUser);
+    return res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        managerId: user.role === "artist" ? user.managerId : undefined,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ message: "Error en la petición" });
   }
 };
 
 export const deleteMe = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
+  let session: mongoose.ClientSession | undefined = undefined;
+  let transactionStarted = false;
   try {
+    session = await mongoose.startSession();
     const { role, id } = req.user;
-    if (role !== "manager" || !id) {
+    if ((role !== "manager" && role !== "artist") || !id) {
       return res.status(403).json({ message: "Credenciales invalidas" });
     }
+
     session.startTransaction();
-    await User.deleteMany({ managerId: id }, { session });
-    const userManager = await User.findOneAndDelete(
-      { _id: id, role: "manager" },
-      { session },
-    );
-    if (!userManager) {
+    transactionStarted = true;
+
+    if (role === "manager") {
+      await User.deleteMany({ managerId: id }, { session });
+    }
+
+    const user = await User.findOneAndDelete({ _id: id, role }, { session });
+    if (!user) {
       await session.abortTransaction();
-      return res.status(404).json({ message: "Manager no encontrado" });
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
     await session.commitTransaction();
+    transactionStarted = false;
     return res.status(200).json({ message: "Usuario borrado corectamente" });
   } catch (error) {
-    await session.abortTransaction();
+    if (session && transactionStarted) await session.abortTransaction();
     return res.status(500).json({ message: "Error en la peticion" });
   } finally {
-    await session.endSession();
+    if (session) await session.endSession();
   }
 };
