@@ -4,6 +4,7 @@ import type {
   User,
   AuthResponse,
   LoginData,
+  GetMeResponse,
 } from "../types/auth";
 
 export const registerUser = async (body: RegisterData): Promise<User> => {
@@ -17,6 +18,6 @@ export const loginUser = async (body: LoginData): Promise<AuthResponse> => {
 };
 
 export const getMe = async (): Promise<User> => {
-  const response = await api.get("/auth/me");
-  return response.data;
+  const response = await api.get<GetMeResponse>("/auth/me");
+  return response.data.user;
 };

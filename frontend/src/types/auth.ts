@@ -29,3 +29,16 @@ export interface Artist extends User {
   role: "artist";
   managerId: string;
 }
+
+export interface GetMeResponse {
+  user: User;
+}
+
+//* interfaces de AuthContext y Provider
+export interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  loading: boolean;
+  login: (data: LoginData) => Promise<void>;
+  logout: () => void;
+}
