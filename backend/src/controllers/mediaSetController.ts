@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { User } from "../models/userModel.js";
 import type { MediaFile } from "../models/mediaSetModel.js";
 import { v2 as cloudinary } from "cloudinary";
+import { deleteMediaSetFiles } from "../utils/cloudinaryUtils.js";
 
 //Create conectado a Cloudinary
 export const createMediaSet = async (req: Request, res: Response) => {
@@ -179,7 +180,7 @@ export const deleteMediaSet = async (req: Request, res: Response) => {
     if (!role || !userId) {
       return res.status(403).json({ message: "Credenciales inválidas" });
     }
-    if (role === "manager") {
+    if (role !== "artist") {
       return res.status(403).json({ message: "Credenciales inválidas" });
     }
 
@@ -190,18 +191,19 @@ export const deleteMediaSet = async (req: Request, res: Response) => {
     if (!mediaSet) {
       return res.status(404).json({ message: "MediaSet no encontrado" });
     }
-    const deleteResults = await Promise.all(
-      mediaSet.files.map((file) => cloudinary.uploader.destroy(file.publicId)),
-    );
-    const acceptedResults = deleteResults.every(
-      (result) => result.result === "ok" || result.result === "not found",
-    );
-    if (!acceptedResults) {
+    const deleted = await deleteMediaSetFiles(mediaSet);
+    if (!deleted) {
       return res
         .status(500)
         .json({ message: "Error al eliminar las fotografías" });
     }
-    await MediaSet.findByIdAndDelete(id);
+    const deletedMediaSet = await MediaSet.findOneAndDelete({
+      _id: id,
+      artistId: userId,
+    });
+    if (!deletedMediaSet) {
+      return res.status(404).json({ message: "MediaSet no encontrado" });
+    }
     return res.status(200).json({ message: "MediaSet borrado correctamente" });
   } catch (error) {
     console.log(error);

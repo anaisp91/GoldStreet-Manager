@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { deleteMediaSetFiles } from "../utils/cloudinaryUtils.js";
+import { MediaSet } from "../models/mediaSetModel.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -233,20 +235,36 @@ export const deleteMe = async (req: Request, res: Response) => {
   try {
     session = await mongoose.startSession();
     const { role, id } = req.user;
-    if ((role !== "manager" && role !== "artist") || !id) {
+    if (role !== "manager" || !id) {
       return res.status(403).json({ message: "Credenciales invalidas" });
     }
 
+    const artists = await User.find({ managerId: id });
+    const artistIds = artists.map((artist) => artist._id);
+
+    const mediaSets = await MediaSet.find({ artistId: { $in: artistIds } });
+
+    const deleteResults = await Promise.all(
+      mediaSets.map((mediaSet) => deleteMediaSetFiles(mediaSet)),
+    );
+    if (!deleteResults.every((result) => result === true)) {
+      return res
+        .status(500)
+        .json({ message: "Error en la eliminación de fotografías" });
+    }
     session.startTransaction();
     transactionStarted = true;
-
-    if (role === "manager") {
-      await User.deleteMany({ managerId: id }, { session });
-    }
-
+    await MediaSet.deleteMany(
+      {
+        artistId: { $in: artistIds },
+      },
+      { session },
+    );
+    await User.deleteMany({ _id: { $in: artistIds } }, { session });
     const user = await User.findOneAndDelete({ _id: id, role }, { session });
     if (!user) {
       await session.abortTransaction();
+      transactionStarted = false;
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     await session.commitTransaction();
