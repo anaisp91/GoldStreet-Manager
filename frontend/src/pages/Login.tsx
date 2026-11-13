@@ -1,31 +1,39 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { LoginData } from "../types/auth";
-import { loginUser, getMe } from "../services/authService";
+import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
+
 export const Login = () => {
+  const context = useContext(AuthContext);
+  if (context === null) {
+    throw new Error("El contexto no está disponible");
+  }
+
+  const { login, loading } = context;
+
   const [formData, setFormData] = useState<LoginData>({
     email: "",
     password: "",
   });
+
   const [ok, setOk] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+
     try {
-      const response = await loginUser(formData);
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-      const myData = await getMe();
-      console.log(myData);
+      const loggedUser = await login(formData);
       setOk(true);
       setTimeout(() => {
-        navigate("/mdash");
+        if (loggedUser.role === "manager") {
+          navigate("/mdash");
+        } else if (loggedUser.role === "artist") {
+          navigate("/adash");
+        }
       }, 2000);
     } catch (error) {
       if (axios.isAxiosError<{ message: string }>(error)) {
@@ -33,8 +41,6 @@ export const Login = () => {
       } else {
         setError("Ha ocurrido un error durante el login");
       }
-    } finally {
-      setLoading(false);
     }
   };
   return (

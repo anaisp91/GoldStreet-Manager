@@ -1,14 +1,17 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, useEffect } from "react";
 import type { User, LoginData } from "../types/auth";
-import { loginUser } from "../services/authService";
+import { loginUser, getMe } from "../services/authService";
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
 export interface AuthProviderProps {
   children: ReactNode;
 }
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(
+    () => !!localStorage.getItem("token"),
+  );
 
   const logout = () => {
     setUser(null);
@@ -17,13 +20,38 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem("token");
   };
 
-  const login = async (data: LoginData): Promise<void> => {
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
+      return;
+    }
+    const recoverUser = async () => {
+      try {
+        const getUser = await getMe();
+        setUser(getUser);
+        setToken(storedToken);
+      } catch (error) {
+        if (
+          axios.isAxiosError<{ message: string }>(error) &&
+          error.response?.status === 401
+        ) {
+          logout();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    recoverUser();
+  }, []);
+
+  const login = async (data: LoginData): Promise<User> => {
     setLoading(true);
     try {
       const response = await loginUser(data);
       setUser(response.user);
       setToken(response.token);
       localStorage.setItem("token", response.token);
+      return response.user;
     } finally {
       setLoading(false);
     }
