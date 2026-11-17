@@ -1,7 +1,7 @@
-import { ArtistCard } from "../components";
-import { Link, Navigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
 import { useContext } from "react";
+import { ArtistCard } from "../components";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 export const Mdashboard = () => {
   const artists = [
@@ -18,13 +18,10 @@ export const Mdashboard = () => {
 
   const { user } = context;
 
-  const role = user?.role;
-
-  return role !== "manager" ? (
-    <Navigate to="/adash" />
-  ) : (
+  return (
     <section className="bg-black flex flex-col gap-3 min-h-screen py-14 px-10">
       <p className="text-gray-400 text-xl">Panel de gestión</p>
+      <p className="text-white text-2xl">Hola, {user?.name}</p>
       <h2 className="text-white text-5xl uppercase font-bold tracking-wider p-1">
         Tu Equipo
       </h2>
