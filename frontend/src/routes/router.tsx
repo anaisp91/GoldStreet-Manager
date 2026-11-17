@@ -10,8 +10,12 @@ import {
   Mdashboard,
   Register,
 } from "../pages";
-import { PublicLayout } from "../layouts/PublicLayout";
-import { PrivateLayout } from "../layouts/PrivateLayout";
+import {
+  PublicLayout,
+  PrivateLayout,
+  ManagerLayout,
+  ArtistLayout,
+} from "../layouts";
 
 export const router = createBrowserRouter([
   {
@@ -35,28 +39,38 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       {
-        path: "/mdash",
-        element: <Mdashboard />,
+        element: <ManagerLayout />,
+        children: [
+          {
+            path: "/mdash",
+            element: <Mdashboard />,
+          },
+          {
+            path: "/add",
+            element: <ArtistRegister />,
+          },
+          {
+            path: "/artistView",
+            element: <ManagerArtistView />,
+          },
+          {
+            path: "/mset",
+            element: <ManagerSetView />,
+          },
+        ],
       },
       {
-        path: "/add",
-        element: <ArtistRegister />,
-      },
-      {
-        path: "/adash",
-        element: <ArtistDashboard />,
-      },
-      {
-        path: "/artistView",
-        element: <ManagerArtistView />,
-      },
-      {
-        path: "/mset",
-        element: <ManagerSetView />,
-      },
-      {
-        path: "/aset",
-        element: <ArtistSetView />,
+        element: <ArtistLayout />,
+        children: [
+          {
+            path: "/adash",
+            element: <ArtistDashboard />,
+          },
+          {
+            path: "/aset",
+            element: <ArtistSetView />,
+          },
+        ],
       },
     ],
   },

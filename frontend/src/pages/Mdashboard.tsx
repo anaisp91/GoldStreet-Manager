@@ -1,5 +1,8 @@
 import { ArtistCard } from "../components";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
+import { useContext } from "react";
+
 export const Mdashboard = () => {
   const artists = [
     { id: 1, name: "Anaïs" },
@@ -7,7 +10,19 @@ export const Mdashboard = () => {
     { id: 3, name: "Irene" },
     { id: 4, name: "Borja" },
   ];
-  return (
+
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("Contexto no disponible");
+  }
+
+  const { user } = context;
+
+  const role = user?.role;
+
+  return role !== "manager" ? (
+    <Navigate to="/adash" />
+  ) : (
     <section className="bg-black flex flex-col gap-3 min-h-screen py-14 px-10">
       <p className="text-gray-400 text-xl">Panel de gestión</p>
       <h2 className="text-white text-5xl uppercase font-bold tracking-wider p-1">
