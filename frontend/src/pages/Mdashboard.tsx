@@ -1,16 +1,11 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ArtistCard } from "../components";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import { getArtists } from "../services/artistService";
+import type { Artist } from "../types/auth";
 
 export const Mdashboard = () => {
-  const artists = [
-    { id: 1, name: "Anaïs" },
-    { id: 2, name: "Aza" },
-    { id: 3, name: "Irene" },
-    { id: 4, name: "Borja" },
-  ];
-
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("Contexto no disponible");
@@ -18,14 +13,43 @@ export const Mdashboard = () => {
 
   const { user } = context;
 
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const getManagerArtists = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const artists = await getArtists();
+      setArtists(artists);
+    } catch {
+      setError("Error al obtener los artistas");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchArtists = async () => {
+      await getManagerArtists();
+    };
+    fetchArtists();
+  }, [user]);
+
   return (
     <section className="bg-black flex flex-col gap-3 min-h-screen py-14 px-10">
+      {loading && <p>Cargando artistas</p>}
+      {error && <p>{error}</p>}
       <p className="text-gray-400 text-xl">Panel de gestión</p>
       <p className="text-white text-2xl">Hola, {user?.name}</p>
       <h2 className="text-white text-5xl uppercase font-bold tracking-wider p-1">
         Tu Equipo
       </h2>
-
+      {!loading && !error && artists.length === 0 && (
+        <p className="text-white text-xl">Añade a tus artistas</p>
+      )}
       <Link
         to="/add"
         className="text-center bg-blue-600 py-2 rounded-md text-white text-lg"
@@ -35,9 +59,12 @@ export const Mdashboard = () => {
 
       <h3 className="text-white text-2xl p-4 tracking-wide">Artistas</h3>
       <ul>
-        {artists.map((artist) => (
-          <ArtistCard key={artist.id} name={artist.name} />
-        ))}
+        {!loading &&
+          !error &&
+          artists.length > 0 &&
+          artists.map((artist) => (
+            <ArtistCard key={artist.id} name={artist.name} id={artist.id} />
+          ))}
       </ul>
     </section>
   );

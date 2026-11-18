@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 export type ArtistCardProps = {
   name: string;
+  id: string;
 };
 
-export const ArtistCard = ({ name }: ArtistCardProps) => {
+export const ArtistCard = ({ name, id }: ArtistCardProps) => {
   return (
     <li className="bg-gray-900 border  rounded-lg p-4 mb-4">
-      <Link to={"/artistView"}>
+      <Link to={`/artistView/${id}`}>
         <div className="flex justify-between text-white py-3 px-2">
           <div className="flex gap-4">
             <svg

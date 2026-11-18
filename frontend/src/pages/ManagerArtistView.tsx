@@ -1,6 +1,9 @@
 import { MediaSet, SetsSummary } from "../components";
+import { useParams } from "react-router-dom";
 
 export const ManagerArtistView = () => {
+  const { artistId } = useParams();
+
   return (
     <section className="bg-black min-h-screen py-14 px-10 flex flex-col gap-3">
       <p className="text-gray-400 text-xl uppercase">
@@ -25,6 +28,7 @@ export const ManagerArtistView = () => {
 
         <div>
           <h2 className="text-blue-600 text-4xl">[Nombre]</h2>
+          {artistId && <p>{artistId}</p>}
           <p className="text-gray-400 text-lg">Artista del estudio</p>
         </div>
       </div>

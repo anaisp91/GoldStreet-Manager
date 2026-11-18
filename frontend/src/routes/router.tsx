@@ -50,7 +50,7 @@ export const router = createBrowserRouter([
             element: <ArtistRegister />,
           },
           {
-            path: "/artistView",
+            path: "/artistView/:artistId",
             element: <ManagerArtistView />,
           },
           {
