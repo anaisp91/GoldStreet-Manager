@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 export const PrivateHeader = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("Contexto no disponible");
+  }
+
+  const { logout } = context;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -43,7 +51,15 @@ export const PrivateHeader = () => {
                   </Link>
                 </li>
                 <li className="text-lg">
-                  <button className="uppercase">Cerrar sesión</button>
+                  <button
+                    className="uppercase"
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Cerrar sesión
+                  </button>
                 </li>
               </ul>
             </nav>

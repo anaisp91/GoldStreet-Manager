@@ -66,9 +66,6 @@ export const ManagerArtistView = () => {
           {!loading && !error && artist && (
             <h2 className="text-blue-600 text-4xl">{artist.name}</h2>
           )}
-
-          {artistId && <p>{artistId}</p>}
-          <p className="text-gray-400 text-lg">Artista del estudio</p>
         </div>
       </div>
       <SetsSummary title="Conjuntos disponibles" total={2} />

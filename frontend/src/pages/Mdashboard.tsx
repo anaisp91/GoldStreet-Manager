@@ -23,7 +23,6 @@ export const Mdashboard = () => {
 
     try {
       const artists = await getArtists();
-      console.log("Artistas Recibidos", artists);
       setArtists(artists);
     } catch {
       setError("Error al obtener los artistas");
@@ -44,7 +43,7 @@ export const Mdashboard = () => {
       {loading && <p>Cargando artistas</p>}
       {error && <p>{error}</p>}
       <p className="text-gray-400 text-xl">Panel de gestión</p>
-      <p className="text-white text-2xl">Hola, {user?.name}</p>
+      <p className="text-white text-2xl pt-5">Hola, {user?.name}</p>
       <h2 className="text-white text-5xl uppercase font-bold tracking-wider p-1">
         Tu Equipo
       </h2>
