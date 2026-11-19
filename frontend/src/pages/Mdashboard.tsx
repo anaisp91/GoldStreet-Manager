@@ -23,6 +23,7 @@ export const Mdashboard = () => {
 
     try {
       const artists = await getArtists();
+      console.log("Artistas Recibidos", artists);
       setArtists(artists);
     } catch {
       setError("Error al obtener los artistas");
@@ -47,9 +48,7 @@ export const Mdashboard = () => {
       <h2 className="text-white text-5xl uppercase font-bold tracking-wider p-1">
         Tu Equipo
       </h2>
-      {!loading && !error && artists.length === 0 && (
-        <p className="text-white text-xl">Añade a tus artistas</p>
-      )}
+
       <Link
         to="/add"
         className="text-center bg-blue-600 py-2 rounded-md text-white text-lg"
@@ -58,6 +57,13 @@ export const Mdashboard = () => {
       </Link>
 
       <h3 className="text-white text-2xl p-4 tracking-wide">Artistas</h3>
+      {!loading && !error && artists.length === 0 && (
+        <p className="text-gray-400 text-lg text-center py-4">
+          Aún no tienes artistas,
+          <br /> añadelos pinchando el botón de arriba
+        </p>
+      )}
+
       <ul>
         {!loading &&
           !error &&

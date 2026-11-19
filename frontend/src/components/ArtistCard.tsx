@@ -5,6 +5,7 @@ export type ArtistCardProps = {
 };
 
 export const ArtistCard = ({ name, id }: ArtistCardProps) => {
+  console.log("Id recibido en ArtistCard", id);
   return (
     <li className="bg-gray-900 border  rounded-lg p-4 mb-4">
       <Link to={`/artistView/${id}`}>

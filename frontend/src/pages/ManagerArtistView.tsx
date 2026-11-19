@@ -22,6 +22,7 @@ export const ManagerArtistView = () => {
       setError(null);
       try {
         const artist = await getArtistById(artistId);
+        console.log("Artista recibido", artist);
         if (!artist) {
           setError("Artista no encontrado");
           return;

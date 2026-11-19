@@ -19,7 +19,13 @@ export const getUsers = async (req: Request, res: Response) => {
     const allUsers = await User.find({
       managerId: id,
     });
-    return res.json(allUsers);
+    const users = allUsers.map((user) => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }));
+    return res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Error al traer los usuarios" });
   }
@@ -79,7 +85,12 @@ export const getUserById = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "El usuario no existe" });
     }
-    return res.json(user);
+    return res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Error en la petición" });
   }
