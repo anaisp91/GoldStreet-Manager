@@ -31,7 +31,7 @@ export const ArtistDashboard = () => {
       <SetsSummary total={mediaSets.length} title="Tus conjuntos" />
 
       <Link
-        to={""}
+        to={"/create"}
         className="bg-blue-600 w-full max-w-sm py-3 text-center text-white rounded-md text-lg mt-2"
       >
         Crear conjunto

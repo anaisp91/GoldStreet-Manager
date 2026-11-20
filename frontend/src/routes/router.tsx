@@ -3,6 +3,7 @@ import {
   ArtistDashboard,
   ArtistRegister,
   ArtistSetView,
+  CreateMediaSet,
   Home,
   Login,
   ManagerArtistView,
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
           {
             path: "/aset",
             element: <ArtistSetView />,
+          },
+          {
+            path: "/create",
+            element: <CreateMediaSet />,
           },
         ],
       },

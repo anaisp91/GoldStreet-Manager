@@ -7,3 +7,4 @@ export * from "./ArtistDashboard";
 export * from "./ManagerArtistView";
 export * from "./ManagerSetView";
 export * from "./ArtistSetView";
+export * from "./CreateMediaSet";
