@@ -58,7 +58,12 @@ export const createMediaSet = async (req: Request, res: Response) => {
 
     const newMediaSet = await MediaSet.create(mediaSet);
 
-    return res.status(201).json(newMediaSet);
+    return res.status(201).json({
+      id: newMediaSet._id,
+      name: newMediaSet.name,
+      createdAt: newMediaSet.createdAt,
+      photoTotal: newMediaSet.files.length,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Error en la petición" });
@@ -71,17 +76,34 @@ export const getAllMediaSet = async (req: Request, res: Response) => {
     if (!role || !userId) {
       return res.status(403).json({ message: "Credenciales inválidas" });
     }
+    if (role !== "artist" && role !== "manager") {
+      return res.status(403).json({ message: "Credenciales inválidas" });
+    }
 
     if (role === "artist") {
       const mediaSets = await MediaSet.find({ artistId: userId });
-      return res.status(200).json(mediaSets);
+      return res.status(200).json(
+        mediaSets.map((media) => ({
+          id: media._id,
+          name: media.name,
+          createdAt: media.createdAt,
+          photoTotal: media.files.length,
+        })),
+      );
     }
     if (role === "manager") {
       const artists = await User.find({ managerId: userId });
       const artistsId = artists.map((artist) => artist._id);
       const mediaSets = await MediaSet.find({ artistId: { $in: artistsId } });
 
-      return res.status(200).json({ mediaSets });
+      return res.status(200).json(
+        mediaSets.map((media) => ({
+          id: media._id,
+          name: media.name,
+          createdAt: media.createdAt,
+          photoTotal: media.files.length,
+        })),
+      );
     }
   } catch (error) {
     return res.status(500).json({ message: "error en la petición" });
