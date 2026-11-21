@@ -33,6 +33,9 @@ export const CreateMediaSet = () => {
       data.set("description", formData.description);
       formData.files.forEach((file) => data.append("files", file));
 
+      console.log("Name:", data.get("name"));
+      console.log("Description:", data.get("description"));
+      console.log("Files:", data.getAll("files"));
       await createMediaSet(data);
 
       navigate("/adash");
