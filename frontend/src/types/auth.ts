@@ -30,6 +30,12 @@ export interface Artist extends User {
   managerId: string;
 }
 
+export interface MediaSetFromData {
+  name: string;
+  description: string;
+  files: File[];
+}
+
 export interface GetMeResponse {
   user: User;
 }
