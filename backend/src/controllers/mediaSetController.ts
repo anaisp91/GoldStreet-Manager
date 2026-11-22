@@ -12,9 +12,6 @@ export const createMediaSet = async (req: Request, res: Response) => {
     const { name, description } = req.body;
     const files = req.files as Express.Multer.File[];
 
-    console.log("BODY", req.body);
-    console.log("FILES", req.files);
-
     if (role !== "artist" || !userId) {
       return res.status(403).json({ message: "Credenciales inválidas" });
     }

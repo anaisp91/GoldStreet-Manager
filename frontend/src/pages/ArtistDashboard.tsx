@@ -1,22 +1,39 @@
 import { Link } from "react-router-dom";
 import { MediaSet, SetsSummary } from "../components";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import type { MediaSetSummary } from "../types/auth";
+import { getAllMediaSets } from "../services/mediaSetService";
 
 export const ArtistDashboard = () => {
-  const mediaSets = [
-    { id: 1, name: "Flores", createdAt: "20/8/2026", photoTotal: 6 },
-    { id: 2, name: "Dragón", createdAt: "21/7/2026", photoTotal: 2 },
-    { id: 3, name: "Mujer", createdAt: "8/6/2026", photoTotal: 4 },
-    { id: 4, name: "Medusa", createdAt: "18/5/2026", photoTotal: 1 },
-  ];
-
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("Context no disponible");
   }
 
   const { user } = context;
+
+  const [mediaSets, setMediaSets] = useState<MediaSetSummary[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const getMediaSets = async () => {
+      setError(null);
+      setLoading(true);
+
+      try {
+        const medias = await getAllMediaSets();
+        setMediaSets(medias);
+      } catch {
+        setError("Error al cargar los conjuntos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getMediaSets();
+  }, [user]);
 
   return (
     <section className="bg-black min-h-screen flex flex-col gap-3 py-14 px-10">
@@ -27,8 +44,14 @@ export const ArtistDashboard = () => {
       <p className=" text-gray-500 text-lg">
         Organiza tu conjuntos y ten tus fotografías listas para compartir.
       </p>
-
-      <SetsSummary total={mediaSets.length} title="Tus conjuntos" />
+      {loading && <p>Cargando conjuntos</p>}
+      {error && <p>{error}</p>}
+      {!loading && !error && mediaSets?.length === 0 && (
+        <p>Crea tu primer conjunto</p>
+      )}
+      {!loading && !error && mediaSets && mediaSets.length > 0 && (
+        <SetsSummary total={mediaSets.length} title="Tus conjuntos" />
+      )}
 
       <Link
         to={"/create"}
@@ -42,10 +65,11 @@ export const ArtistDashboard = () => {
         </p>
         <div>
           <ul>
-            {mediaSets.map((item) => (
+            {mediaSets?.map((item) => (
               <MediaSet
                 key={item.id}
                 name={item.name}
+                id={item.id}
                 createdAt={item.createdAt}
                 photoTotal={item.photoTotal}
               />

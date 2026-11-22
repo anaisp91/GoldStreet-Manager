@@ -36,6 +36,13 @@ export interface MediaSetFromData {
   files: File[];
 }
 
+export interface MediaSetSummary {
+  id: string;
+  name: string;
+  createdAt: string;
+  photoTotal: number;
+}
+
 export interface GetMeResponse {
   user: User;
 }

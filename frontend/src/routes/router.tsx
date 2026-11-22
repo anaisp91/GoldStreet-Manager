@@ -68,7 +68,7 @@ export const router = createBrowserRouter([
             element: <ArtistDashboard />,
           },
           {
-            path: "/aset",
+            path: "/aset/:id",
             element: <ArtistSetView />,
           },
           {
