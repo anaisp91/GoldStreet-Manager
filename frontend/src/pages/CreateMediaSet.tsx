@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { MediaSetFromData } from "../types/auth";
+import type { MediaSetFromData } from "../types";
 import { createMediaSet } from "../services/mediaSetService";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { MediaSet, SetsSummary } from "../components";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import type { MediaSetSummary } from "../types/auth";
+import type { MediaSetSummary } from "../types";
 import { getAllMediaSets } from "../services/mediaSetService";
 
 export const ArtistDashboard = () => {

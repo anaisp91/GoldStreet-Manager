@@ -123,7 +123,16 @@ export const getMediaSetById = async (req: Request, res: Response) => {
       if (!mediaSet) {
         return res.status(404).json({ message: "MediaSet no encontrado" });
       }
-      return res.status(200).json(mediaSet);
+      return res.status(200).json({
+        id: mediaSet._id,
+        name: mediaSet.name,
+        description: mediaSet.description,
+        used: mediaSet.used,
+        artistId: mediaSet.artistId,
+        createdAt: mediaSet.createdAt,
+        updatedAt: mediaSet.updatedAt,
+        files: mediaSet.files,
+      });
     }
     if (role === "manager") {
       const artists = await User.find({ managerId: userId });
@@ -135,7 +144,16 @@ export const getMediaSetById = async (req: Request, res: Response) => {
       if (!mediaSet) {
         return res.status(404).json({ message: "MediaSet no encontrado" });
       }
-      return res.status(200).json(mediaSet);
+      return res.status(200).json({
+        id: mediaSet._id,
+        name: mediaSet.name,
+        description: mediaSet.description,
+        used: mediaSet.used,
+        artistId: mediaSet.artistId,
+        createdAt: mediaSet.createdAt,
+        updatedAt: mediaSet.updatedAt,
+        files: mediaSet.files,
+      });
     }
   } catch (error) {
     return res.status(500).json({ message: "Error en la petición" });

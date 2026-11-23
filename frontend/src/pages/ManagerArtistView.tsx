@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MediaSet, SetsSummary } from "../components";
 import { useParams } from "react-router-dom";
-import type { Artist } from "../types/auth";
+import type { Artist } from "../types";
 import { getArtistById } from "../services/artistService";
 
 export const ManagerArtistView = () => {

@@ -3,7 +3,7 @@ import { ArtistCard } from "../components";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { getArtists } from "../services/artistService";
-import type { Artist } from "../types/auth";
+import type { Artist } from "../types";
 
 export const Mdashboard = () => {
   const context = useContext(AuthContext);

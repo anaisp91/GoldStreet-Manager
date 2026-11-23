@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
-import type { RegisterData } from "../types/auth";
+import type { RegisterData } from "../types";
 import { registerUser } from "../services/authService";
 
 export const Register = () => {

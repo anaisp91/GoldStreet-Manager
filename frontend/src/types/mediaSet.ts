@@ -1,0 +1,22 @@
+export interface MediaSetSummary {
+  id: string;
+  name: string;
+  createdAt: string;
+  photoTotal: number;
+}
+
+export interface MediaSetDetail {
+  id: string;
+  name: string;
+  artistId: string;
+  used: boolean;
+  createdAt: string;
+  updatedAt: string;
+  description?: string;
+  files: MediaFile[];
+}
+
+interface MediaFile {
+  url: string;
+  publicId: string;
+}
