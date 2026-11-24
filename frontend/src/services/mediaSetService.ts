@@ -1,5 +1,9 @@
 import { api } from "./api";
-import type { MediaSetSummary, MediaSetDetail } from "../types";
+import type {
+  MediaSetSummary,
+  MediaSetDetail,
+  UpdateMediaSetArtist,
+} from "../types";
 
 export const createMediaSet = async (
   body: FormData,
@@ -21,4 +25,12 @@ export const getMediaByID = async (id: string): Promise<MediaSetDetail> => {
 export const deleteMedia = async (id: string): Promise<void> => {
   await api.delete(`/media-set/${id}`);
   return;
+};
+
+export const updateMediaSetArtist = async (
+  id: string,
+  body: UpdateMediaSetArtist,
+): Promise<MediaSetDetail> => {
+  const response = await api.put<MediaSetDetail>(`/media-set/${id}`, body);
+  return response.data;
 };

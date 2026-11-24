@@ -20,3 +20,12 @@ interface MediaFile {
   url: string;
   publicId: string;
 }
+
+export interface UpdateMediaSetArtist {
+  name?: string;
+  description?: string;
+}
+
+export interface UpdateMediaSetManager {
+  used?: boolean;
+}

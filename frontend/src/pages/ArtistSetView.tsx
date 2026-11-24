@@ -58,50 +58,39 @@ export const ArtistSetView = () => {
       {!loading && !error && mediaSet && (
         <section className="bg-black min-h-screen py-14 px-10 flex flex-col gap-3">
           <p className="text-gray-400 uppercase text-lg">Panel de gestión</p>
-          <h2 className="text-white text-4xl uppercase tracking-wider">
-            Conjunto <span className="text-blue-600">{mediaSet?.name}</span>
+          <h2 className="text-blue-600 text-5xl uppercase pt-5 tracking-wider font-extrabold">
+            {mediaSet?.name}
           </h2>
-          <p className="text-gray-400 text-xl">
+          <p className="text-gray-400 text-lg">
             Creado el {mediaSet?.createdAt}
           </p>
-          <div className="flex flex-row gap-5 border border-gray-700 rounded-md bg-gray-900 py-3 px-7 my-4 items-center">
-            <svg
-              className="w-9 h-9 text-blue-600"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m3 16 5-7 6 6.5m6.5 2.5L16 13l-4.286 6M14 10h.01M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"
-              />
-            </svg>
-            <div>
-              <p className="text-gray-400 text-lg uppercase">Fotografías</p>
-              <p className="text-white text-xl">
-                {mediaSet?.files.length} Imagenes
-              </p>
-            </div>
-          </div>
-
+          {mediaSet.description && (
+            <p className="text-gray-400 text-xl">{mediaSet?.description}</p>
+          )}
           <section className="py-6">
             <p className="text-white text-2xl font-bold">Fotografías</p>
             <ul className="text-white text-lg font-bold grid grid-cols-2 gap-4 py-8 ">
               {mediaSet.files.map((file) => (
                 <li key={file.publicId}>
-                  <div className="w-full aspect-square rounded-lg bg-gray-900">
-                    <img src={file.url} alt="fotografia del conjunto" />
+                  <div className="w-full aspect-square rounded-lg ">
+                    <img
+                      src={file.url}
+                      alt="fotografia del conjunto"
+                      className="w-full aspect-square object-contain"
+                    />
                   </div>
                 </li>
               ))}
             </ul>
           </section>
+          <Link
+            to={`/aupdate/${id}`}
+            className="w-full  text-center border border-gray-600 rounded-lg py-5 px-10 mb-3 hover:bg-gray-600 group"
+          >
+            <p className="text-gray-500 text-xl font-bold group-hover:text-black active:text-black">
+              Modificar conjunto
+            </p>
+          </Link>
 
           <button
             className="flex flex-col gap-3 bg-transparent  w-full border border-red-500 rounded-lg py-5 px-10 items-center justify-center hover:bg-red-500 active:bg-red-500 group"
