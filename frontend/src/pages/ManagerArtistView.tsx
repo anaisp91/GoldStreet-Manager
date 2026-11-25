@@ -1,47 +1,72 @@
 import { useEffect, useState } from "react";
 import { MediaSet, SetsSummary } from "../components";
 import { useParams } from "react-router-dom";
-import type { Artist } from "../types";
+import type { Artist, MediaSetManagerSummary } from "../types";
 import { getArtistById } from "../services/artistService";
+import { getMediaByArtist } from "../services/mediaSetService";
 
 export const ManagerArtistView = () => {
   const { artistId } = useParams();
   const [artist, setArtist] = useState<Artist | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingArtist, setLoadingArtist] = useState<boolean>(false);
+  const [errorArtist, setErrorArtist] = useState<string | null>(null);
+  const [mediaSets, setMediaSets] = useState<MediaSetManagerSummary[]>();
+  const [loadingMedia, setLoadingMedia] = useState<boolean>(true);
+  const [errorMedia, setErrorMedia] = useState<string | null>(null);
 
   useEffect(() => {
     const getArtist = async () => {
-      setLoading(true);
+      setLoadingArtist(true);
       setArtist(null);
       if (!artistId) {
-        setError("Artista no encontrado");
-        setLoading(false);
+        setErrorArtist("Artista no encontrado");
+        setLoadingArtist(false);
         return;
       }
-      setError(null);
+      setErrorArtist(null);
       try {
         const artist = await getArtistById(artistId);
         console.log("Artista recibido", artist);
         if (!artist) {
-          setError("Artista no encontrado");
+          setErrorArtist("Artista no encontrado");
           return;
         }
         setArtist(artist);
       } catch {
-        setError("Error en la carga del artista");
+        setErrorArtist("Error en la carga del artista");
       } finally {
-        setLoading(false);
+        setLoadingArtist(false);
       }
     };
 
     getArtist();
   }, [artistId]);
 
+  useEffect(() => {
+    const fetchMediaByArtist = async () => {
+      setLoadingMedia(true);
+      setErrorMedia(null);
+      if (!artistId) {
+        setErrorMedia("Artista no disponible");
+        setLoadingMedia(false);
+        return;
+      }
+      try {
+        const media = await getMediaByArtist(artistId);
+        setMediaSets(media);
+      } catch {
+        setErrorMedia("Error al cargar los conjuntos");
+      } finally {
+        setLoadingMedia(false);
+      }
+    };
+    fetchMediaByArtist();
+  }, [artistId]);
+
   return (
     <section className="bg-black min-h-screen py-14 px-10 flex flex-col gap-3">
-      {loading && <p className="text-white text-lg">Cargando Artista</p>}
-      {error && <p className="text-white text-lg">{error}</p>}
+      {loadingArtist && <p className="text-white text-lg">Cargando Artista</p>}
+      {errorArtist && <p className="text-white text-lg">{errorArtist}</p>}
       <p className="text-gray-400 text-xl uppercase">
         Panel de gestión / Artistas
       </p>
@@ -63,17 +88,33 @@ export const ManagerArtistView = () => {
         </svg>
 
         <div>
-          {!loading && !error && artist && (
+          {!loadingArtist && !errorArtist && artist && (
             <h2 className="text-blue-600 text-4xl">{artist.name}</h2>
           )}
         </div>
       </div>
-      <SetsSummary title="Conjuntos disponibles" total={2} />
+      <SetsSummary
+        title="Conjuntos disponibles"
+        total={mediaSets?.length ?? 0}
+      />
       <section>
+        {errorMedia && <p>{errorMedia}</p>}
         <p className="text-white text-xl font-bold">Sus conjuntos</p>
-        <ul>
-          <MediaSet name={"Flores"} createdAt={"20/10/26"} photoTotal={4} />
-        </ul>
+        {loadingMedia && <p>Cargando conjuntos</p>}
+        {!loadingMedia && !errorMedia && mediaSets && (
+          <ul>
+            {mediaSets.map((media) => (
+              <li key={media.id}>
+                <MediaSet
+                  id={media.id}
+                  name={media.name}
+                  createdAt={media.createdAt}
+                  photoTotal={media.photoTotal}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </section>
   );

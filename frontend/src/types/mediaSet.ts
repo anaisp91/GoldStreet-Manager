@@ -5,6 +5,14 @@ export interface MediaSetSummary {
   photoTotal: number;
 }
 
+export interface MediaSetManagerSummary {
+  id: string;
+  name: string;
+  used: boolean;
+  createdAt: string;
+  photoTotal: number;
+}
+
 export interface MediaSetDetail {
   id: string;
   name: string;

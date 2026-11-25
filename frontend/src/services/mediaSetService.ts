@@ -1,8 +1,10 @@
 import { api } from "./api";
+
 import type {
   MediaSetSummary,
   MediaSetDetail,
   UpdateMediaSetArtist,
+  MediaSetManagerSummary,
 } from "../types";
 
 export const createMediaSet = async (
@@ -32,5 +34,14 @@ export const updateMediaSetArtist = async (
   body: UpdateMediaSetArtist,
 ): Promise<MediaSetDetail> => {
   const response = await api.put<MediaSetDetail>(`/media-set/${id}`, body);
+  return response.data;
+};
+
+export const getMediaByArtist = async (
+  artistId: string,
+): Promise<MediaSetManagerSummary[]> => {
+  const response = await api.get<MediaSetManagerSummary[]>(
+    `/media-set/artist/${artistId}`,
+  );
   return response.data;
 };
