@@ -163,7 +163,7 @@ export const getMediaSetById = async (req: Request, res: Response) => {
 export const getMediaSetByArtistId = async (req: Request, res: Response) => {
   try {
     const { role, id: userId } = req.user;
-    const { id: artistId } = req.params;
+    const { artistId } = req.params;
 
     if (!role || !userId) {
       return res.status(403).json({ message: "Creadenciales inválidas" });
