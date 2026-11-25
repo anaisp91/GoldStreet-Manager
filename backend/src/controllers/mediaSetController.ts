@@ -160,6 +160,43 @@ export const getMediaSetById = async (req: Request, res: Response) => {
   }
 };
 
+export const getMediaSetByArtistId = async (req: Request, res: Response) => {
+  try {
+    const { role, id: userId } = req.user;
+    const { id: artistId } = req.params;
+
+    if (!role || !userId) {
+      return res.status(403).json({ message: "Creadenciales inválidas" });
+    }
+    if (role !== "manager") {
+      return res.status(403).json({ message: "Credenciales inválidas" });
+    }
+    if (!artistId || typeof artistId !== "string") {
+      return res.status(400).json({ message: "Id de artista inválido" });
+    }
+    const artist = await User.findOne({
+      _id: artistId,
+      managerId: userId,
+      role: "artist",
+    });
+    if (!artist) {
+      return res.status(404).json({ message: "Artista no encontrado" });
+    }
+    const mediaSets = await MediaSet.find({ artistId });
+    return res.status(200).json(
+      mediaSets.map((media) => ({
+        id: media.id,
+        name: media.name,
+        used: media.used,
+        createdAt: media.createdAt,
+        photoTotal: media.files.length,
+      })),
+    );
+  } catch (error) {
+    return res.status(500).json({ message: "error en la petición" });
+  }
+};
+
 export const updateMediaSet = async (req: Request, res: Response) => {
   try {
     const { role, id: userId } = req.user;

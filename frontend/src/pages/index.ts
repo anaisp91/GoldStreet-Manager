@@ -8,4 +8,4 @@ export * from "./ManagerArtistView";
 export * from "./ManagerSetView";
 export * from "./ArtistSetView";
 export * from "./CreateMediaSet";
-export * from "./UpdateMediaSetArtist";
+export * from "./UpdateMediaArtist";

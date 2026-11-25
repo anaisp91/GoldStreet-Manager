@@ -10,7 +10,7 @@ import {
   ManagerSetView,
   Mdashboard,
   Register,
-  UpdateMediaSetArtist,
+  UpdateMediaArtist,
 } from "../pages";
 import {
   PublicLayout,
@@ -78,7 +78,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "/aupdate/:id",
-            element: <UpdateMediaSetArtist />,
+            element: <UpdateMediaArtist />,
           },
         ],
       },
