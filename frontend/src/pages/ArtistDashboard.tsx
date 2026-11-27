@@ -67,6 +67,7 @@ export const ArtistDashboard = () => {
           <ul>
             {mediaSets?.map((item) => (
               <MediaSet
+                to={`/aset/${item.id}`}
                 key={item.id}
                 name={item.name}
                 id={item.id}

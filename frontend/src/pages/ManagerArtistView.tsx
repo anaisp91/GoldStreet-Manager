@@ -104,14 +104,13 @@ export const ManagerArtistView = () => {
         {!loadingMedia && !errorMedia && mediaSets && (
           <ul>
             {mediaSets.map((media) => (
-              <li key={media.id}>
-                <MediaSet
-                  id={media.id}
-                  name={media.name}
-                  createdAt={media.createdAt}
-                  photoTotal={media.photoTotal}
-                />
-              </li>
+              <MediaSet
+                to={`/mset/${media.id}`}
+                id={media.id}
+                name={media.name}
+                createdAt={media.createdAt}
+                photoTotal={media.photoTotal}
+              />
             ))}
           </ul>
         )}

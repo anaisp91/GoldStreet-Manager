@@ -56,7 +56,7 @@ export const router = createBrowserRouter([
             element: <ManagerArtistView />,
           },
           {
-            path: "/mset",
+            path: "/mset/:id",
             element: <ManagerSetView />,
           },
         ],

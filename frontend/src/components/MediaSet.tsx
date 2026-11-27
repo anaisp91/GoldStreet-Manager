@@ -4,6 +4,7 @@ export type MediaSetProps = {
   id: string;
   createdAt: string;
   photoTotal: number;
+  to: string;
 };
 
 export const MediaSet = ({
@@ -11,10 +12,14 @@ export const MediaSet = ({
   createdAt,
   photoTotal,
   id,
+  to,
 }: MediaSetProps) => {
   return (
-    <li className="bg-gray-900 py-4 my-4 border border-gray-700 rounded-lg">
-      <Link to={`/aset/${id}`}>
+    <li
+      key={id}
+      className="bg-gray-900 py-4 my-4 border border-gray-700 rounded-lg"
+    >
+      <Link to={to}>
         <div className="flex flex-row justify-between items-center px-7">
           <div className="flex flex-row items-center gap-6">
             <svg
