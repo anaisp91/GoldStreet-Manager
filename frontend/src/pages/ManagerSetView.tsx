@@ -86,7 +86,7 @@ export const ManagerSetView = () => {
               <p className="text-white text-2xl font-bold">Fotografías</p>
               <ul className="text-white text-lg font-bold grid grid-cols-1 gap-4 py-8 ">
                 {mediaSet.files.map((file) => (
-                  <li>
+                  <li className="flex flex-col gap-2" key={file.publicId}>
                     <div className="w-full aspect-square rounded-lg bg-gray-900 ">
                       <img
                         src={file.url}
@@ -94,6 +94,15 @@ export const ManagerSetView = () => {
                         className="w-full aspect-square object-contain"
                       />
                     </div>
+                    <a
+                      href={file.url.replace(
+                        "/upload/",
+                        "/upload/fl_attachment,f_jpg/",
+                      )}
+                      className="w-full bg-gray-800 py-3 rounded-lg text-center"
+                    >
+                      Descargar
+                    </a>
                   </li>
                 ))}
               </ul>
